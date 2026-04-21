@@ -17,7 +17,7 @@
     "@astrojs/cloudflare": "^13.1.8",
     "@astrojs/preact": "^5.1.1",
     "@dotforge/core": "^0.8.0",
-    "astro": "^6.1.5",
+    "astro": "^6.1.8",
     "lucide-preact": "^1.8.0",
     "preact": "^10.29.1"
   },
