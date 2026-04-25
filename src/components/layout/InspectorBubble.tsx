@@ -32,14 +32,15 @@ export default function InspectorBubble({
         position: "fixed",
         top: `${pos.top}px`,
         left: `${pos.left}px`,
-        background: "white",
-        border: "1px solid #ccc",
+        background: "var(--panel)",
+        color: "var(--text)",
+        border: "1px solid var(--panel-border)",
         padding: "8px 12px",
         borderRadius: "8px",
         fontFamily: "sans-serif",
         fontSize: "13px",
         zIndex: 9999,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
         minWidth: "180px",
       }}
     >

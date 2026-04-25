@@ -1,10 +1,10 @@
 export type ThemeId = "light" | "dark" | "solarized" | "neon";
 
 export const themeColors: Record<ThemeId, string> = {
-  light: "#f6f8fa", // GitHub Light panel
-  dark: "#21252b", // One Dark panel
-  solarized: "#eee8d5", // Solarized Light panel
-  neon: "#21222c", // Dracula panel
+  light: "#f6f8fa",
+  dark: "#161b22",
+  solarized: "#eee8d5",
+  neon: "#24283b",
 };
 
 export const themes = [

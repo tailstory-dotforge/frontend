@@ -17,15 +17,15 @@ html.theme-light {
 
 html.theme-dark {
   color-scheme: dark;
-  --bg: #20232a;
-  --panel: #21252b;
-  --panel-border: #3e4451;
-  --button-bg: #2c313a;
-  --button-border: #3e4451;
-  --button-hover: #3e4451;
-  --icon: #ced4e0;
-  --icon-hover: #e6e6e6;
-  --text: #e5e9f0;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel-border: #30363d;
+  --button-bg: #21262d;
+  --button-border: #30363d;
+  --button-hover: #30363d;
+  --icon: #c9d1d9;
+  --icon-hover: #ffffff;
+  --text: #f0f6fc;
 }
 
 html.theme-solarized {
@@ -43,13 +43,13 @@ html.theme-solarized {
 
 html.theme-neon {
   color-scheme: dark;
-  --bg: #1e1f29;
-  --panel: #21222c;
-  --panel-border: #44475a;
-  --button-bg: #343746;
-  --button-border: #44475a;
-  --button-hover: #44475a;
-  --icon: #bd93f9;
+  --bg: #1a1b26;
+  --panel: #24283b;
+  --panel-border: #565f89;
+  --button-bg: #2f334d;
+  --button-border: #565f89;
+  --button-hover: #414868;
+  --icon: #c0caf5;
   --icon-hover: #ff79c6;
-  --text: #ffffff;
+  --text: #f8f8f2;
 }
