@@ -57,9 +57,13 @@ export default function PropertiesPanel({
         <br />
         <input
           type="number"
+          min={0.1}
+          step={0.1}
           value={element.fontSize}
           onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => {
-            element.fontSize = Number(e.currentTarget.value);
+            const next = Number(e.currentTarget.value);
+            if (!Number.isFinite(next) || next <= 0) return;
+            element.fontSize = next;
             onChange();
           }}
           style={{
