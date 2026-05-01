@@ -14,8 +14,9 @@ export default function PropertiesPanel({
     <div
       style={{
         position: "fixed",
-        top: "112px",
+        top: "50%",
         left: "16px",
+        transform: "translateY(-50%)",
         background: "var(--panel)",
         color: "var(--text)",
         border: "1px solid var(--panel-border)",
