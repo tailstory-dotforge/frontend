@@ -1,7 +1,7 @@
 import type { TextElement } from "@dotforge/core";
 import type { JSX } from "preact";
 
-export default function InspectorBubble({
+export default function PropertiesPanel({
   element,
   onChange,
 }: {
@@ -14,7 +14,7 @@ export default function InspectorBubble({
     <div
       style={{
         position: "fixed",
-        top: "80px",
+        top: "112px",
         left: "16px",
         background: "var(--panel)",
         color: "var(--text)",

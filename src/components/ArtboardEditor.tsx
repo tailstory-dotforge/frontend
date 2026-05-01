@@ -1,6 +1,6 @@
 import type { ArtboardDocument, TextElement } from "@dotforge/core";
 import { useState } from "preact/hooks";
-import InspectorBubble from "../components/layout/InspectorBubble";
+import PropertiesPanel from "../components/layout/PropertiesPanel";
 import ShapesToolbar, { type Tool } from "../components/layout/ShapesToolbar";
 import ArtboardRenderer from "./ArtboardRenderer";
 
@@ -39,7 +39,7 @@ export default function ArtboardEditor({
 
       <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />
 
-      <InspectorBubble element={selected} onChange={forceUpdate} />
+      <PropertiesPanel element={selected} onChange={forceUpdate} />
     </div>
   );
 }
