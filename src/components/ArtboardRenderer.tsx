@@ -20,7 +20,7 @@ export default function ArtboardRenderer({
       ref={canvasRef}
       style={{
         width: "100%",
-        height: "100vh",
+        height: "100%",
         display: "flex",
         overflow: "auto",
         position: "relative",

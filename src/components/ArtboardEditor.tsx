@@ -25,7 +25,8 @@ export default function ArtboardEditor({
     <div
       style={{
         position: "relative",
-        height: "100%",
+        flex: 1,
+        minHeight: 0,
         width: "100%",
       }}
     >
