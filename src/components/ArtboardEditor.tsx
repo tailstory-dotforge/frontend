@@ -1,19 +1,20 @@
 import type { ArtboardDocument, TextElement } from "@dotforge/core";
 import { useEffect, useState } from "preact/hooks";
+import FileToolbar from "../components/layout/FileToolbar";
 import PropertiesPanel from "../components/layout/PropertiesPanel";
 import ShapesToolbar, { type Tool } from "../components/layout/ShapesToolbar";
+import { downloadArtboard, parseArtboard } from "../lib/dotforge";
 import ArtboardRenderer from "./ArtboardRenderer";
 
 export default function ArtboardEditor({
-  artboard,
+  artboard: initialArtboard,
 }: {
   artboard: ArtboardDocument;
 }) {
+  const [artboard, setArtboard] = useState<ArtboardDocument>(initialArtboard);
   const [selected, setSelected] = useState<TextElement | null>(null);
   const [revision, setRevision] = useState(0);
   const [activeTool, setActiveTool] = useState<Tool>("select");
-  const [width, setWidth] = useState(artboard.width);
-  const [height, setHeight] = useState(artboard.height);
 
   function handleSelect(el: TextElement | null) {
     setSelected(el);
@@ -71,7 +72,27 @@ export default function ArtboardEditor({
     forceUpdate();
   }
 
-  const sizedArtboard = { ...artboard, width, height };
+  function handleResize(width: number, height: number) {
+    setArtboard((prev) => ({ ...prev, width, height }));
+  }
+
+  function handleDownload() {
+    downloadArtboard(artboard);
+  }
+
+  async function handleUploadFile(file: File) {
+    try {
+      const text = await file.text();
+      const loaded = parseArtboard(text);
+      setArtboard(loaded);
+      setSelected(null);
+      setActiveTool("select");
+      forceUpdate();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      window.alert(`Failed to load .dotforge file: ${message}`);
+    }
+  }
 
   return (
     <div
@@ -83,20 +104,22 @@ export default function ArtboardEditor({
       }}
     >
       <ArtboardRenderer
-        artboard={sizedArtboard}
+        artboard={artboard}
         selected={selected}
         onSelect={handleSelect}
         revision={revision}
-        onResize={(w, h) => {
-          setWidth(w);
-          setHeight(h);
-        }}
+        onResize={handleResize}
         onMoveElement={handleMoveElement}
         onAddTextElement={handleAddTextElement}
         activeTool={activeTool}
       />
 
       <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />
+
+      <FileToolbar
+        onDownload={handleDownload}
+        onUploadFile={handleUploadFile}
+      />
 
       <PropertiesPanel
         element={selected}
