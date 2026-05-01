@@ -19,7 +19,7 @@ export default function PropertiesPanel({
         background: "var(--panel)",
         color: "var(--text)",
         border: "1px solid var(--panel-border)",
-        padding: "12px 14px",
+        padding: "20px 24px",
         borderRadius: "8px",
         fontFamily: "sans-serif",
         fontSize: "13px",
@@ -28,11 +28,11 @@ export default function PropertiesPanel({
         width: "204px",
       }}
     >
-      <div style={{ marginBottom: "10px", fontWeight: 600 }}>
+      <div style={{ marginBottom: "20px", fontWeight: 600 }}>
         Text Properties
       </div>
 
-      <label style={{ display: "block", marginBottom: "10px" }}>
+      <label style={{ display: "block", marginBottom: "20px" }}>
         Text
         <br />
         <input
@@ -44,12 +44,12 @@ export default function PropertiesPanel({
           }}
           style={{
             width: "100%",
-            marginTop: "4px",
+            marginTop: "8px",
           }}
         />
       </label>
 
-      <label style={{ display: "block", marginBottom: "8px" }}>
+      <label style={{ display: "block" }}>
         Font Size (mm)
         <br />
         <input
@@ -61,7 +61,7 @@ export default function PropertiesPanel({
           }}
           style={{
             width: "100%",
-            marginTop: "4px",
+            marginTop: "8px",
           }}
         />
       </label>
