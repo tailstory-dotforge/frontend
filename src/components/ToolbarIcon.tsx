@@ -4,11 +4,16 @@ export default function ToolbarIcon({
   label,
   children,
   onClick,
+  active = false,
 }: {
   label: string;
   children: ComponentChildren;
   onClick?: () => void;
+  active?: boolean;
 }) {
+  const baseBg = active ? "var(--button-hover)" : "var(--button-bg)";
+  const baseColor = active ? "var(--icon-hover)" : "var(--icon)";
+
   return (
     <button
       type="button"
@@ -18,7 +23,7 @@ export default function ToolbarIcon({
         width: "32px",
         height: "32px",
         borderRadius: "6px",
-        background: "var(--button-bg)",
+        background: baseBg,
         border: "1px solid var(--button-border)",
         cursor: "pointer",
         display: "flex",
@@ -26,15 +31,15 @@ export default function ToolbarIcon({
         justifyContent: "center",
         padding: 0,
         transition: "background 0.15s, color 0.15s",
-        color: "var(--icon)",
+        color: baseColor,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.color = "var(--icon-hover)";
         e.currentTarget.style.background = "var(--button-hover)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.color = "var(--icon)";
-        e.currentTarget.style.background = "var(--button-bg)";
+        e.currentTarget.style.color = baseColor;
+        e.currentTarget.style.background = baseBg;
       }}
     >
       {cloneElement(children, {

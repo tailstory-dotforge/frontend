@@ -2,10 +2,11 @@
 import "../styles/global.css";
 import "../styles/themes.css";
 import DebugBanner from "../components/debug/DebugBanner.astro";
-import TopBar from "../components/layout/TopBar";
+import MainMenu from "../components/layout/MainMenu";
+import ModuleSwitcher from "../components/layout/ModuleSwitcher";
 import { themeColors } from "../lib/theme";
 
-const { pageTitle } = Astro.props;
+const { pageTitle, activeModule = "artboard" } = Astro.props;
 const themeColorsJson = JSON.stringify(themeColors);
 ---
 
@@ -39,7 +40,8 @@ const themeColorsJson = JSON.stringify(themeColors);
 
     <body>
         <DebugBanner />
-        <TopBar client:load />
+        <ModuleSwitcher activeModule={activeModule} client:load />
+        <MainMenu client:load />
         <slot />
     </body>
 </html>
