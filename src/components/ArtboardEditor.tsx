@@ -10,13 +10,11 @@ export default function ArtboardEditor({
   artboard: ArtboardDocument;
 }) {
   const [selected, setSelected] = useState<TextElement | null>(null);
-  const [selectedNode, setSelectedNode] = useState<HTMLElement | null>(null);
   const [revision, setRevision] = useState(0);
   const [activeTool, setActiveTool] = useState<Tool>("select");
 
-  function handleSelect(el: TextElement | null, node?: HTMLElement | null) {
+  function handleSelect(el: TextElement | null) {
     setSelected(el);
-    setSelectedNode(node ?? null);
   }
 
   function forceUpdate() {
@@ -41,11 +39,7 @@ export default function ArtboardEditor({
 
       <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />
 
-      <InspectorBubble
-        element={selected}
-        elementNode={selectedNode}
-        onChange={forceUpdate}
-      />
+      <InspectorBubble element={selected} onChange={forceUpdate} />
     </div>
   );
 }
