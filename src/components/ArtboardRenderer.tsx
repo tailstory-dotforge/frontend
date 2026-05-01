@@ -8,7 +8,7 @@ export default function ArtboardRenderer({
 }: {
   artboard: ArtboardDocument;
   selected: TextElement | null;
-  onSelect: (el: TextElement | null, node?: HTMLElement | null) => void;
+  onSelect: (el: TextElement | null) => void;
   revision: number;
 }) {
   const canvasRef = useRef<HTMLDivElement | null>(null);
@@ -57,7 +57,7 @@ export default function ArtboardRenderer({
             key={el.id}
             onClick={(e) => {
               e.stopPropagation();
-              onSelect(el, e.currentTarget as HTMLElement);
+              onSelect(el);
             }}
             style={{
               position: "absolute",
