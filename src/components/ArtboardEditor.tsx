@@ -12,6 +12,8 @@ export default function ArtboardEditor({
   const [selected, setSelected] = useState<TextElement | null>(null);
   const [revision, setRevision] = useState(0);
   const [activeTool, setActiveTool] = useState<Tool>("select");
+  const [width, setWidth] = useState(artboard.width);
+  const [height, setHeight] = useState(artboard.height);
 
   function handleSelect(el: TextElement | null) {
     setSelected(el);
@@ -20,6 +22,8 @@ export default function ArtboardEditor({
   function forceUpdate() {
     setRevision((r) => r + 1);
   }
+
+  const sizedArtboard = { ...artboard, width, height };
 
   return (
     <div
@@ -31,10 +35,14 @@ export default function ArtboardEditor({
       }}
     >
       <ArtboardRenderer
-        artboard={artboard}
+        artboard={sizedArtboard}
         selected={selected}
         onSelect={handleSelect}
         revision={revision}
+        onResize={(w, h) => {
+          setWidth(w);
+          setHeight(h);
+        }}
       />
 
       <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />
