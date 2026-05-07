@@ -14,11 +14,11 @@
     "test:headed": "playwright test --headed"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.2.1",
+    "@astrojs/cloudflare": "^13.3.0",
     "@astrojs/preact": "^5.1.2",
     "@dotforge/core": "^0.8.0",
-    "astro": "^6.1.9",
-    "lucide-preact": "^1.11.0",
+    "astro": "^6.2.1",
+    "lucide-preact": "^1.14.0",
     "preact": "^10.29.1"
   },
   "devDependencies": {
