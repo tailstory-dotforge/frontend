@@ -4,7 +4,7 @@ export const themeColors: Record<ThemeId, string> = {
   light: "#f6f8fa",
   dark: "#161b22",
   solarized: "#eee8d5",
-  neon: "#0a0e27",
+  neon: "#1a1f3a",
 };
 
 export const themes = [
