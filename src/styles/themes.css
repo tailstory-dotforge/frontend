@@ -43,13 +43,13 @@ html.theme-solarized {
 
 html.theme-neon {
   color-scheme: dark;
-  --bg: #1a1b26;
-  --panel: #24283b;
-  --panel-border: #565f89;
-  --button-bg: #2f334d;
-  --button-border: #565f89;
-  --button-hover: #414868;
-  --icon: #c0caf5;
-  --icon-hover: #ff79c6;
-  --text: #f8f8f2;
+  --bg: #0a0e27;
+  --panel: #1a1f3a;
+  --panel-border: #7b82d1;
+  --button-bg: #1a1f3a;
+  --button-border: #7b82d1;
+  --button-hover: #2d334d;
+  --icon: #f0f0f0;
+  --icon-hover: #ff00ff;
+  --text: #ffffff;
 }
