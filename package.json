@@ -14,7 +14,7 @@
     "test:headed": "playwright test --headed"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.5.1",
+    "@astrojs/cloudflare": "^13.5.2",
     "@astrojs/preact": "^5.1.3",
     "@dotforge/core": "^0.8.0",
     "astro": "^6.2.2",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.8.0",
+    "@types/node": "^25.9.1",
     "wrangler": "^4.94.0"
   },
   "engines": {
