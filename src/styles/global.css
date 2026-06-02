@@ -24,3 +24,67 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Floating UI groups — positioning lives here so media queries can override
+   the components' inline visual styles. */
+.df-float-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+.df-float-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+.df-float-top-center {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+.df-props-panel {
+  position: fixed;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  width: 204px;
+  border-radius: 8px;
+  z-index: 9999;
+}
+
+@media (max-width: 640px) {
+  .df-float-left {
+    top: 8px;
+    left: 8px;
+  }
+  .df-float-right {
+    top: 8px;
+    right: 8px;
+  }
+
+  /* Center tool toolbar → full-width bottom bar, wraps if needed */
+  .df-float-top-center {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    transform: none;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Text Properties → full-width bottom sheet */
+  .df-props-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: auto;
+    border-radius: 12px 12px 0 0;
+  }
+}

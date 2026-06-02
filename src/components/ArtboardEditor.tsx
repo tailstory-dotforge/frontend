@@ -115,14 +115,10 @@ export default function ArtboardEditor({
       />
 
       <div
+        class="df-float-top-center"
         style={{
-          position: "absolute",
-          top: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
           display: "flex",
           gap: "12px",
-          zIndex: 1000,
         }}
       >
         <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />

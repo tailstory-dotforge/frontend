@@ -14,21 +14,15 @@ export default function PropertiesPanel({
 
   return (
     <div
+      class="df-props-panel"
       style={{
-        position: "fixed",
-        top: "50%",
-        left: "16px",
-        transform: "translateY(-50%)",
         background: "var(--panel)",
         color: "var(--text)",
         border: "1px solid var(--panel-border)",
         padding: "12px 14px",
-        borderRadius: "8px",
         fontFamily: "sans-serif",
         fontSize: "13px",
-        zIndex: 9999,
         boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
-        width: "204px",
       }}
     >
       <div style={{ marginBottom: "10px", fontWeight: 600 }}>
