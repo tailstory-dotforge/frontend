@@ -5,10 +5,10 @@ import cloudflare from "@astrojs/cloudflare";
 import preact from "@astrojs/preact";
 import { defineConfig } from "astro/config";
 
-// Get Git commit hash at build time
+// Get the short Git commit hash at build time
 const getGitCommitHash = () => {
   try {
-    return execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
+    return execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
   } catch (_error) {
     return "unknown";
   }
