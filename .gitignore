@@ -2,6 +2,7 @@
 .astro/
 .wrangler/
 dist/
+worker-configuration.d.ts
 
 node_modules/
 

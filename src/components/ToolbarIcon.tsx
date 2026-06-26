@@ -1,4 +1,4 @@
-import { type ComponentChildren, cloneElement } from "preact";
+import { cloneElement, type VNode } from "preact";
 
 export default function ToolbarIcon({
   label,
@@ -7,7 +7,7 @@ export default function ToolbarIcon({
   active = false,
 }: {
   label: string;
-  children: ComponentChildren;
+  children: VNode;
   onClick?: () => void;
   active?: boolean;
 }) {
