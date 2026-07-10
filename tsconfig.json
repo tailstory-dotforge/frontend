@@ -6,7 +6,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["./worker-configuration.d.ts"],
+    "types": ["./worker-configuration.d.ts", "node"],
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   }
