@@ -10,8 +10,10 @@ test("homepage loads successfully", async ({ page }) => {
 test("document editor is present", async ({ page }) => {
   await page.goto("/");
 
-  // Wait for the document editor component to be visible
-  // The DocumentEditor component should be present on the page
-  const documentEditor = page.locator("body");
-  await expect(documentEditor).toBeVisible();
+  // The file toolbar and the rendered sample document prove the
+  // DocumentEditor component actually mounted
+  await expect(
+    page.getByRole("button", { name: "Download .dotforge" }),
+  ).toBeVisible();
+  await expect(page.getByText("Hello Dotforge")).toBeVisible();
 });
