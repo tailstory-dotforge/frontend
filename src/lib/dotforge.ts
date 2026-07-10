@@ -1,13 +1,13 @@
-import type { ArtboardDocument } from "@dotforge/core";
+import type { DotforgeDocument } from "@dotforge/core";
 
 export const DOTFORGE_FILE_EXTENSION = ".dotforge";
 export const DOTFORGE_MIME_TYPE = "application/json";
 
-export function serializeArtboard(artboard: ArtboardDocument): string {
-  return JSON.stringify(artboard, null, 2);
+export function serializeDocument(doc: DotforgeDocument): string {
+  return JSON.stringify(doc, null, 2);
 }
 
-export function parseArtboard(text: string): ArtboardDocument {
+export function parseDocument(text: string): DotforgeDocument {
   const parsed = JSON.parse(text);
   if (
     !parsed ||
@@ -18,14 +18,14 @@ export function parseArtboard(text: string): ArtboardDocument {
   ) {
     throw new Error("Not a valid .dotforge file");
   }
-  return parsed as ArtboardDocument;
+  return parsed as DotforgeDocument;
 }
 
-export function downloadArtboard(
-  artboard: ArtboardDocument,
-  filename = `artboard${DOTFORGE_FILE_EXTENSION}`,
+export function downloadDocument(
+  doc: DotforgeDocument,
+  filename = `untitled${DOTFORGE_FILE_EXTENSION}`,
 ) {
-  const blob = new Blob([serializeArtboard(artboard)], {
+  const blob = new Blob([serializeDocument(doc)], {
     type: DOTFORGE_MIME_TYPE,
   });
   const url = URL.createObjectURL(blob);

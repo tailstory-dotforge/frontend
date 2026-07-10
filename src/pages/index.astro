@@ -1,9 +1,9 @@
 ---
-import ArtboardEditor from "@/components/ArtboardEditor.tsx";
+import DocumentEditor from "@/components/DocumentEditor.tsx";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import SampleArtboard from "@/SampleArtboard";
+import SampleDocument from "@/SampleDocument";
 ---
 
-<BaseLayout pageTitle="DotForge - Editor" activeModule="artboard">
-  <ArtboardEditor artboard={SampleArtboard()} client:load />
+<BaseLayout pageTitle="Dotforge - Editor" activeModule="artboard">
+  <DocumentEditor doc={SampleDocument()} client:load />
 </BaseLayout>

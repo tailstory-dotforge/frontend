@@ -1,11 +1,11 @@
-import type { TextElement } from "@dotforge/core";
+import type { DotforgeDocument, TextElement } from "@dotforge/core";
 import { useRef } from "preact/hooks";
 import type { Tool } from "./layout/ShapesToolbar";
 
 const DRAG_THRESHOLD_PX = 3;
 
 export default function ArtboardRenderer({
-  artboard,
+  doc,
   selected,
   onSelect,
   onResize,
@@ -13,7 +13,7 @@ export default function ArtboardRenderer({
   onAddTextElement,
   activeTool,
 }: {
-  artboard: import("@dotforge/core").ArtboardDocument;
+  doc: DotforgeDocument;
   selected: TextElement | null;
   onSelect: (el: TextElement | null) => void;
   revision: number;
@@ -30,15 +30,15 @@ export default function ArtboardRenderer({
     if (!paper) return px;
     const rect = paper.getBoundingClientRect();
     if (rect.width === 0) return px;
-    return (px / rect.width) * artboard.width;
+    return (px / rect.width) * doc.width;
   }
 
   function clientToMm(clientX: number, clientY: number) {
     const paper = paperRef.current;
     if (!paper) return { x: 0, y: 0 };
     const rect = paper.getBoundingClientRect();
-    const scaleX = rect.width === 0 ? 1 : artboard.width / rect.width;
-    const scaleY = rect.height === 0 ? 1 : artboard.height / rect.height;
+    const scaleX = rect.width === 0 ? 1 : doc.width / rect.width;
+    const scaleY = rect.height === 0 ? 1 : doc.height / rect.height;
     return {
       x: (clientX - rect.left) * scaleX,
       y: (clientY - rect.top) * scaleY,
@@ -69,8 +69,8 @@ export default function ArtboardRenderer({
       }
       const nextX = startX + pxToMm(dx);
       const nextY = startY + pxToMm(dy);
-      const clampedX = Math.max(0, Math.min(artboard.width, nextX));
-      const clampedY = Math.max(0, Math.min(artboard.height, nextY));
+      const clampedX = Math.max(0, Math.min(doc.width, nextX));
+      const clampedY = Math.max(0, Math.min(doc.height, nextY));
       onMoveElement(el, clampedX, clampedY);
     };
 
@@ -132,8 +132,8 @@ export default function ArtboardRenderer({
             background: "white",
             border: "2px solid var(--panel-border)",
             borderRadius: "6px",
-            width: `${artboard.width}mm`,
-            height: `${artboard.height}mm`,
+            width: `${doc.width}mm`,
+            height: `${doc.height}mm`,
             overflow: "hidden",
             display: "flex",
             alignItems: "flex-start",
@@ -143,7 +143,7 @@ export default function ArtboardRenderer({
           }}
           onClick={handlePaperClick}
         >
-          {artboard.elements.map((el) => (
+          {doc.elements.map((el) => (
             // biome-ignore lint/a11y/useKeyWithClickEvents: Artboard elements use pointer-based drag/click interaction for visual editing.
             // biome-ignore lint/a11y/noStaticElementInteractions: Artboard elements use pointer-based drag/click interaction for visual editing.
             <div
@@ -195,11 +195,11 @@ export default function ArtboardRenderer({
               <input
                 type="number"
                 min={1}
-                value={artboard.width}
+                value={doc.width}
                 onInput={(e) => {
                   const v = Number((e.target as HTMLInputElement).value);
                   if (Number.isFinite(v) && v > 0) {
-                    onResize(v, artboard.height);
+                    onResize(v, doc.height);
                   }
                 }}
                 style={{ width: "60px" }}
@@ -213,11 +213,11 @@ export default function ArtboardRenderer({
               <input
                 type="number"
                 min={1}
-                value={artboard.height}
+                value={doc.height}
                 onInput={(e) => {
                   const v = Number((e.target as HTMLInputElement).value);
                   if (Number.isFinite(v) && v > 0) {
-                    onResize(artboard.width, v);
+                    onResize(doc.width, v);
                   }
                 }}
                 style={{ width: "60px" }}

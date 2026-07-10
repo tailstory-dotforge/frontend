@@ -1,17 +1,17 @@
-import type { ArtboardDocument, TextElement } from "@dotforge/core";
+import type { DotforgeDocument, TextElement } from "@dotforge/core";
 import { useEffect, useState } from "preact/hooks";
 import FileToolbar from "../components/layout/FileToolbar";
 import PropertiesPanel from "../components/layout/PropertiesPanel";
 import ShapesToolbar, { type Tool } from "../components/layout/ShapesToolbar";
-import { downloadArtboard, parseArtboard } from "../lib/dotforge";
+import { downloadDocument, parseDocument } from "../lib/dotforge";
 import ArtboardRenderer from "./ArtboardRenderer";
 
-export default function ArtboardEditor({
-  artboard: initialArtboard,
+export default function DocumentEditor({
+  doc: initialDoc,
 }: {
-  artboard: ArtboardDocument;
+  doc: DotforgeDocument;
 }) {
-  const [artboard, setArtboard] = useState<ArtboardDocument>(initialArtboard);
+  const [doc, setDoc] = useState<DotforgeDocument>(initialDoc);
   const [selected, setSelected] = useState<TextElement | null>(null);
   const [revision, setRevision] = useState(0);
   const [activeTool, setActiveTool] = useState<Tool>("select");
@@ -31,9 +31,9 @@ export default function ArtboardEditor({
   }
 
   function handleDeleteElement(el: TextElement) {
-    const idx = artboard.elements.indexOf(el);
+    const idx = doc.elements.indexOf(el);
     if (idx === -1) return;
-    artboard.elements.splice(idx, 1);
+    doc.elements.splice(idx, 1);
     setSelected((current) => (current === el ? null : current));
     forceUpdate();
   }
@@ -66,25 +66,25 @@ export default function ArtboardEditor({
       text: "Text",
       fontSize: 3,
     };
-    artboard.elements.push(newEl);
+    doc.elements.push(newEl);
     setSelected(newEl);
     setActiveTool("select");
     forceUpdate();
   }
 
   function handleResize(width: number, height: number) {
-    setArtboard((prev) => ({ ...prev, width, height }));
+    setDoc((prev) => ({ ...prev, width, height }));
   }
 
   function handleDownload() {
-    downloadArtboard(artboard);
+    downloadDocument(doc);
   }
 
   async function handleUploadFile(file: File) {
     try {
       const text = await file.text();
-      const loaded = parseArtboard(text);
-      setArtboard(loaded);
+      const loaded = parseDocument(text);
+      setDoc(loaded);
       setSelected(null);
       setActiveTool("select");
       forceUpdate();
@@ -104,7 +104,7 @@ export default function ArtboardEditor({
       }}
     >
       <ArtboardRenderer
-        artboard={artboard}
+        doc={doc}
         selected={selected}
         onSelect={handleSelect}
         revision={revision}
