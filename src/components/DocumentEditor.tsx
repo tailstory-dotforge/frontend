@@ -131,6 +131,9 @@ export default function DocumentEditor({
     if (!dirty) return;
     function onBeforeUnload(e: BeforeUnloadEvent) {
       e.preventDefault();
+      // Older Chromium/legacy browsers only show the prompt when
+      // returnValue is set; the string itself is ignored.
+      e.returnValue = "";
     }
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);

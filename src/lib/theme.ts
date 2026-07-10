@@ -16,7 +16,8 @@ export const themes = [
 ] as const;
 
 export function isThemeId(value: string): value is ThemeId {
-  return value in themeColors;
+  // Own-property check: `in` would accept inherited keys like "toString".
+  return Object.hasOwn(themeColors, value);
 }
 
 /**

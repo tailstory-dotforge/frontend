@@ -43,7 +43,12 @@ export default function NumberField({
         const raw = e.currentTarget.value;
         setText(raw);
         const next = Number(raw);
-        if (raw !== "" && Number.isFinite(next) && next > 0) {
+        if (
+          raw !== "" &&
+          Number.isFinite(next) &&
+          next > 0 &&
+          (min === undefined || next >= min)
+        ) {
           onCommit(next);
         }
       }}

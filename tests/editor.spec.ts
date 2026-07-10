@@ -155,6 +155,13 @@ test("W/H inputs resize the artboard", async ({ page }) => {
   await expect(paper(page)).toHaveAttribute("style", /height: 90mm/);
 });
 
+test("values below the input minimum are not committed", async ({ page }) => {
+  // W has min=1; a sub-minimum value must not resize the artboard.
+  // (\s* because the untouched SSR style attribute has no space.)
+  await page.getByRole("spinbutton", { name: "W mm" }).fill("0.5");
+  await expect(paper(page)).toHaveAttribute("style", /width:\s*100mm/);
+});
+
 test("download/upload round-trips the document", async ({ page }) => {
   // Edit first so the round-trip carries a change.
   await sampleElement(page).click();
@@ -209,9 +216,13 @@ test("theme selection applies and persists across reload", async ({ page }) => {
 });
 
 test("garbage stored theme falls back to a valid theme", async ({ page }) => {
-  await page.evaluate(() => {
-    localStorage.setItem("dotforge-theme", "definitely-not-a-theme");
-  });
-  await page.reload();
-  await expect(page.locator("html")).toHaveClass(/theme-(light|dark)$/);
+  // "toString" exercises the prototype-chain hole: a plain `in` /
+  // truthy-lookup check would accept it as a theme id.
+  for (const garbage of ["definitely-not-a-theme", "toString", "__proto__"]) {
+    await page.evaluate((value) => {
+      localStorage.setItem("dotforge-theme", value);
+    }, garbage);
+    await page.reload();
+    await expect(page.locator("html")).toHaveClass(/theme-(light|dark)$/);
+  }
 });

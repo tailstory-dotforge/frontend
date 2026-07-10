@@ -37,7 +37,9 @@ const {
             (function() {
                 var saved = localStorage.getItem("dotforge-theme");
                 var resolved;
-                if (saved && themeColors[saved]) {
+                // Own-property check: a truthy lookup would accept inherited
+                // keys like "toString" from a crafted localStorage value.
+                if (saved && Object.prototype.hasOwnProperty.call(themeColors, saved)) {
                     resolved = saved;
                 } else {
                     // "system", unset, or a stale/unknown value.
