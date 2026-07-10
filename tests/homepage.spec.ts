@@ -15,7 +15,5 @@ test("document editor is present", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Download .dotforge" }),
   ).toBeVisible();
-  await expect(
-    page.getByText("Hello Dotforge", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("Hello Dotforge", { exact: true })).toBeVisible();
 });
