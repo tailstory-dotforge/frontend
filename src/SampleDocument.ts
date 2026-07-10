@@ -1,6 +1,6 @@
-import type { ArtboardDocument } from "@dotforge/core";
+import type { DotforgeDocument } from "@dotforge/core";
 
-export default function SampleArtboard(): ArtboardDocument {
+export default function SampleDocument(): DotforgeDocument {
   return {
     width: 100,
     height: 150,
@@ -9,7 +9,7 @@ export default function SampleArtboard(): ArtboardDocument {
         type: "text",
         x: 5,
         y: 10,
-        text: "Hello DotForge",
+        text: "Hello Dotforge",
         fontSize: 3,
       },
     ],

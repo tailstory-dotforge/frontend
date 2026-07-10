@@ -4,14 +4,16 @@ test("homepage loads successfully", async ({ page }) => {
   await page.goto("/");
 
   // Check that the page title is correct
-  await expect(page).toHaveTitle(/DotForge - Editor/);
+  await expect(page).toHaveTitle(/Dotforge - Editor/);
 });
 
-test("artboard editor is present", async ({ page }) => {
+test("document editor is present", async ({ page }) => {
   await page.goto("/");
 
-  // Wait for the artboard editor component to be visible
-  // The ArtboardEditor component should be present on the page
-  const artboardEditor = page.locator("body");
-  await expect(artboardEditor).toBeVisible();
+  // The file toolbar and the rendered sample document prove the
+  // DocumentEditor component actually mounted
+  await expect(
+    page.getByRole("button", { name: "Download .dotforge" }),
+  ).toBeVisible();
+  await expect(page.getByText("Hello Dotforge", { exact: true })).toBeVisible();
 });
