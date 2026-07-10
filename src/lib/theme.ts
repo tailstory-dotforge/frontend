@@ -15,11 +15,30 @@ export const themes = [
   { id: "neon", label: "Neon" },
 ] as const;
 
+export function isThemeId(value: string): value is ThemeId {
+  // Own-property check: `in` would accept inherited keys like "toString".
+  return Object.hasOwn(themeColors, value);
+}
+
+/**
+ * Resolve a stored preference to a concrete theme. "system" and any
+ * unknown/stale value fall back to the OS preference.
+ */
 export function resolveTheme(theme: string): ThemeId {
-  if (theme === "system") {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-  return theme as ThemeId;
+  if (isThemeId(theme)) return theme;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+/**
+ * Apply a resolved theme to the document: root class plus the browser-chrome
+ * theme color. The pre-paint bootstrap in BaseLayout.astro mirrors this logic
+ * inline (it runs before modules can load), so keep the two in sync.
+ */
+export function applyResolvedTheme(resolved: ThemeId) {
+  document.documentElement.className = `theme-${resolved}`;
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", themeColors[resolved]);
 }

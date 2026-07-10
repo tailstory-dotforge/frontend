@@ -1,0 +1,34 @@
+---
+import { LayoutDashboard } from "lucide-preact";
+import type { ModuleId } from "../../lib/modules";
+
+interface Props {
+  activeModule: ModuleId;
+}
+
+const { activeModule } = Astro.props;
+
+// The ZPL editor has no page yet; its entry returns here once /zpl exists.
+const modules: {
+  id: ModuleId;
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+}[] = [{ id: "artboard", label: "Artboard", href: "/", icon: LayoutDashboard }];
+---
+
+<nav class="df-float-left df-panel" aria-label="Modules">
+  {
+    modules.map(({ id, label, href, icon: Icon }) => (
+      <a
+        href={href}
+        title={label}
+        aria-label={label}
+        aria-current={activeModule === id ? "page" : undefined}
+        class:list={["df-toolbar-btn", { "is-active": activeModule === id }]}
+      >
+        <Icon size={20} strokeWidth={2} color="currentColor" />
+      </a>
+    ))
+  }
+</nav>

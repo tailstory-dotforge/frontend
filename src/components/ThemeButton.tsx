@@ -1,6 +1,6 @@
 import { Palette } from "lucide-preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { resolveTheme, type ThemeId, themeColors, themes } from "../lib/theme";
+import { applyResolvedTheme, resolveTheme, themes } from "../lib/theme";
 import ToolbarIcon from "./ToolbarIcon";
 
 export default function ThemeButton() {
@@ -20,10 +20,7 @@ export default function ThemeButton() {
     function handleChange() {
       const saved = localStorage.getItem("dotforge-theme");
       if (saved === "system" || !saved) {
-        const resolved: ThemeId = mediaQuery.matches ? "dark" : "light";
-        document.documentElement.className = `theme-${resolved}`;
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute("content", themeColors[resolved]);
+        applyResolvedTheme(resolveTheme("system"));
       }
     }
     mediaQuery.addEventListener("change", handleChange);
@@ -42,22 +39,34 @@ export default function ThemeButton() {
 
   function applyTheme(t: string) {
     setTheme(t);
-    const resolved = resolveTheme(t);
-    document.documentElement.className = `theme-${resolved}`;
     localStorage.setItem("dotforge-theme", t);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", themeColors[resolved]);
+    applyResolvedTheme(resolveTheme(t));
     setOpen(false);
   }
 
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === "Escape" && open) {
+      setOpen(false);
+      ref.current?.querySelector("button")?.focus();
+    }
+  }
+
   return (
-    <div style={{ position: "relative" }} ref={ref}>
-      <ToolbarIcon label="Theme" onClick={() => setOpen(!open)}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: Escape handling for the popup; the trigger button itself is focusable and interactive.
+    <div style={{ position: "relative" }} ref={ref} onKeyDown={handleKeyDown}>
+      <ToolbarIcon
+        label="Theme"
+        onClick={() => setOpen(!open)}
+        ariaHasPopup="menu"
+        ariaExpanded={open}
+      >
         <Palette />
       </ToolbarIcon>
 
       {open && (
         <div
+          role="menu"
+          aria-label="Theme"
           style={{
             position: "absolute",
             top: "40px",
@@ -74,28 +83,11 @@ export default function ThemeButton() {
           {themes.map((t) => (
             <button
               type="button"
+              role="menuitemradio"
+              aria-checked={theme === t.id}
               key={t.id}
               onClick={() => applyTheme(t.id)}
-              style={{
-                display: "block",
-                width: "100%",
-                textAlign: "left",
-                border: "none",
-                padding: "8px 12px",
-                cursor: "pointer",
-                color: "var(--text)",
-                background:
-                  theme === t.id ? "var(--button-hover)" : "transparent",
-                transition: "background 0.1s",
-                font: "inherit",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "var(--button-hover)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background =
-                  theme === t.id ? "var(--button-hover)" : "transparent";
-              }}
+              class={`df-menu-item${theme === t.id ? " is-active" : ""}`}
             >
               {t.label}
             </button>

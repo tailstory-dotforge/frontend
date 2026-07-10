@@ -2,6 +2,10 @@
 import DocumentEditor from "@/components/DocumentEditor.tsx";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SampleDocument from "@/SampleDocument";
+
+// No request-time logic: build this page once and serve it from the CDN
+// instead of invoking the Worker per request.
+export const prerender = true;
 ---
 
 <BaseLayout pageTitle="Dotforge - Editor" activeModule="artboard">

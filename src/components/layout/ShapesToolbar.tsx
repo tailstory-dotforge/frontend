@@ -16,17 +16,7 @@ export default function ShapesToolbar({
   onSelectTool: (tool: Tool) => void;
 }) {
   return (
-    <div
-      style={{
-        background: "var(--panel)",
-        border: "1px solid var(--panel-border)",
-        borderRadius: "10px",
-        padding: "8px 12px",
-        display: "flex",
-        gap: "12px",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-      }}
-    >
+    <div class="df-panel">
       {tools.map(({ id, label, icon: Icon }) => (
         <ToolbarIcon
           key={id}

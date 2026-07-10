@@ -4,43 +4,29 @@ export default function ToolbarIcon({
   label,
   children,
   onClick,
-  active = false,
+  active,
+  ariaHasPopup,
+  ariaExpanded,
 }: {
   label: string;
   children: VNode;
   onClick?: () => void;
+  /** For toggle buttons; exposed to assistive tech as aria-pressed. */
   active?: boolean;
+  /** For buttons that open a popup (e.g. the theme menu). */
+  ariaHasPopup?: "menu";
+  ariaExpanded?: boolean;
 }) {
-  const baseBg = active ? "var(--button-hover)" : "var(--button-bg)";
-  const baseColor = active ? "var(--icon-hover)" : "var(--icon)";
-
   return (
     <button
       type="button"
       title={label}
+      aria-label={label}
+      aria-pressed={active}
+      aria-haspopup={ariaHasPopup}
+      aria-expanded={ariaExpanded}
       onClick={onClick}
-      style={{
-        width: "32px",
-        height: "32px",
-        borderRadius: "6px",
-        background: baseBg,
-        border: "1px solid var(--button-border)",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 0,
-        transition: "background 0.15s, color 0.15s",
-        color: baseColor,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.color = "var(--icon-hover)";
-        e.currentTarget.style.background = "var(--button-hover)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.color = baseColor;
-        e.currentTarget.style.background = baseBg;
-      }}
+      class={`df-toolbar-btn${active ? " is-active" : ""}`}
     >
       {cloneElement(children, {
         size: 20,

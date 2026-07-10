@@ -41,9 +41,13 @@ export default defineConfig({
     },
   ],
 
-  /* Run your local dev server before starting the tests */
+  /* Run your local dev server before starting the tests. On CI, build and
+     preview instead so build-only failures (prerender errors, adapter
+     bundling) are caught before deploy. */
   webServer: {
-    command: "npm run dev",
+    command: process.env.CI
+      ? "npm run build && npm run preview"
+      : "npm run dev",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

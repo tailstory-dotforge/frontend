@@ -20,9 +20,6 @@ export default defineConfig({
   output: "server",
   adapter: cloudflare(),
   vite: {
-    build: {
-      minify: false,
-    },
     define: {
       __GIT_COMMIT_HASH__: JSON.stringify(getGitCommitHash()),
     },
