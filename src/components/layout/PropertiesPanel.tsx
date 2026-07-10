@@ -1,17 +1,17 @@
 import type { TextElement } from "@dotforge/core";
-import type { JSX } from "preact";
+import type { TargetedInputEvent } from "preact";
+import type { EditorElement } from "../../lib/dotforge";
+import NumberField from "../NumberField";
 
 export default function PropertiesPanel({
   element,
   onChange,
   onDelete,
 }: {
-  element: TextElement | null;
-  onChange: () => void;
+  element: EditorElement;
+  onChange: (patch: Partial<TextElement>) => void;
   onDelete: () => void;
 }) {
-  if (!element) return null;
-
   return (
     <div
       class="df-props-panel"
@@ -35,9 +35,8 @@ export default function PropertiesPanel({
         <input
           type="text"
           value={element.text}
-          onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => {
-            element.text = e.currentTarget.value;
-            onChange();
+          onInput={(e: TargetedInputEvent<HTMLInputElement>) => {
+            onChange({ text: e.currentTarget.value });
           }}
           style={{
             width: "100%",
@@ -46,20 +45,18 @@ export default function PropertiesPanel({
         />
       </label>
 
-      <label style={{ display: "block", marginBottom: "8px" }}>
+      <label
+        htmlFor="df-font-size"
+        style={{ display: "block", marginBottom: "8px" }}
+      >
         Font Size (mm)
         <br />
-        <input
-          type="number"
+        <NumberField
+          id="df-font-size"
+          value={element.fontSize}
           min={0.1}
           step={0.1}
-          value={element.fontSize}
-          onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => {
-            const next = Number(e.currentTarget.value);
-            if (!Number.isFinite(next) || next <= 0) return;
-            element.fontSize = next;
-            onChange();
-          }}
+          onCommit={(next) => onChange({ fontSize: next })}
           style={{
             width: "100%",
             marginTop: "4px",
