@@ -3,11 +3,21 @@ import "../styles/global.css";
 import "../styles/themes.css";
 import DebugBanner from "../components/debug/DebugBanner.astro";
 import MainMenu from "../components/layout/MainMenu";
-import ModuleSwitcher from "../components/layout/ModuleSwitcher";
+import ModuleSwitcher from "../components/layout/ModuleSwitcher.astro";
+import type { ModuleId } from "../lib/modules";
 import { themeColors } from "../lib/theme";
 
-const { pageTitle, activeModule = "artboard" } = Astro.props;
-const themeColorsJson = JSON.stringify(themeColors);
+interface Props {
+  pageTitle?: string;
+  activeModule?: ModuleId;
+  description?: string;
+}
+
+const {
+  pageTitle,
+  activeModule = "artboard",
+  description = "Dotforge — a label and artboard document editor",
+} = Astro.props;
 ---
 
 <html lang="en" class="no-transition">
@@ -15,21 +25,28 @@ const themeColorsJson = JSON.stringify(themeColors);
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content={themeColors.light} />
+        <meta name="description" content={description} />
+        <meta property="og:title" content={pageTitle || "Dotforge"} />
+        <meta property="og:description" content={description} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <title>{pageTitle || "Dotforge"}</title>
-        <script is:inline define:vars={{ themeColorsJson }}>
+        <script is:inline define:vars={{ themeColors }}>
+            // Pre-paint theme bootstrap. Mirrors applyResolvedTheme in
+            // src/lib/theme.ts (which cannot be imported from an inline
+            // script) — keep the two in sync.
             (function() {
-                var themeColors = JSON.parse(themeColorsJson);
                 var saved = localStorage.getItem("dotforge-theme");
                 var resolved;
-                if (saved === "system" || !saved) {
+                if (saved && themeColors[saved]) {
+                    resolved = saved;
+                } else {
+                    // "system", unset, or a stale/unknown value.
                     var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
                     resolved = prefersDark ? "dark" : "light";
-                } else {
-                    resolved = saved;
                 }
                 document.documentElement.className = "no-transition theme-" + resolved;
                 var meta = document.querySelector('meta[name="theme-color"]');
-                if (meta) meta.setAttribute("content", themeColors[resolved] || themeColors.light);
+                if (meta) meta.setAttribute("content", themeColors[resolved]);
                 requestAnimationFrame(function() {
                     requestAnimationFrame(function() {
                         document.documentElement.classList.remove("no-transition");
@@ -41,8 +58,8 @@ const themeColorsJson = JSON.stringify(themeColors);
 
     <body>
         <DebugBanner />
-        <ModuleSwitcher activeModule={activeModule} client:load />
-        <MainMenu client:load />
+        <ModuleSwitcher activeModule={activeModule} />
+        <MainMenu client:idle />
         <slot />
     </body>
 </html>
