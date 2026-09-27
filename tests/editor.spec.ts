@@ -89,9 +89,6 @@ test("delete button removes the selected element", async ({ page }) => {
 
 test("delete key removes the selected element", async ({ page }) => {
   await sampleElement(page).click();
-  // Wait for the selection to render; the window keydown listener is
-  // (re-)registered in an effect that flushes with the next frame.
-  await expect(propertiesPanel(page)).toBeVisible();
   await page.keyboard.press("Delete");
   await expect(sampleElement(page)).not.toBeVisible();
 });
@@ -157,18 +154,40 @@ test("arrow keys nudge a focused element", async ({ page }) => {
 });
 
 test("W/H inputs resize the artboard", async ({ page }) => {
-  await page.getByRole("spinbutton", { name: "W mm" }).fill("120");
+  const width = page.getByRole("spinbutton", { name: "W mm" });
+  await width.fill("120");
+  await width.blur();
   await expect(paper(page)).toHaveAttribute("style", /width: 120mm/);
 
-  await page.getByRole("spinbutton", { name: "H mm" }).fill("90");
+  const height = page.getByRole("spinbutton", { name: "H mm" });
+  await height.fill("90");
+  await height.press("Enter");
   await expect(paper(page)).toHaveAttribute("style", /height: 90mm/);
 });
 
-test("values below the input minimum are not committed", async ({ page }) => {
-  // W has min=1; a sub-minimum value must not resize the artboard.
+test("typing a page size keeps elements where they are", async ({ page }) => {
+  // Regression: every keystroke used to resize the page, so the "1" on the
+  // way to "120" squeezed the paper to 1mm and clamped the sample element
+  // (at x=5mm) to the left edge for good.
+  const width = page.getByRole("spinbutton", { name: "W mm" });
+  await width.selectText();
+  await width.pressSequentially("120");
+  await width.press("Tab");
+  await expect(paper(page)).toHaveAttribute("style", /width: 120mm/);
+  await expect(sampleElement(page)).toHaveAttribute("style", /left:\s*5mm/);
+});
+
+test("values outside the input range are not committed", async ({ page }) => {
+  // W takes 1–10000mm; out-of-range values must not resize the artboard,
+  // and the field falls back to the current size.
   // (\s* because the untouched SSR style attribute has no space.)
-  await page.getByRole("spinbutton", { name: "W mm" }).fill("0.5");
-  await expect(paper(page)).toHaveAttribute("style", /width:\s*100mm/);
+  const width = page.getByRole("spinbutton", { name: "W mm" });
+  for (const value of ["0.5", "20000"]) {
+    await width.fill(value);
+    await width.blur();
+    await expect(paper(page)).toHaveAttribute("style", /width:\s*100mm/);
+    await expect(width).toHaveValue("100");
+  }
 });
 
 test("download/upload round-trips the document", async ({ page }) => {

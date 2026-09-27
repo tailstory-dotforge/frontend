@@ -4,13 +4,23 @@ import type {
   TargetedPointerEvent,
 } from "preact";
 import { useRef } from "preact/hooks";
-import type { EditorDocument, EditorElement } from "../lib/dotforge";
+import {
+  type EditorDocument,
+  type EditorElement,
+  MAX_DIMENSION_MM,
+} from "../lib/dotforge";
 import type { Tool } from "./layout/ShapesToolbar";
 import NumberField from "./NumberField";
 
 const DRAG_THRESHOLD_PX = 3;
 const NUDGE_MM = 1;
 const NUDGE_LARGE_MM = 5;
+const NUDGE_DIRECTIONS: Record<string, [number, number]> = {
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+};
 
 export default function ArtboardRenderer({
   doc,
@@ -24,41 +34,36 @@ export default function ArtboardRenderer({
   doc: EditorDocument;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
-  onResize?: (width: number, height: number) => void;
+  onResize: (width: number, height: number) => void;
   onMoveElement: (id: string, x: number, y: number) => void;
   onAddTextElement: (x: number, y: number) => void;
   activeTool: Tool;
 }) {
   const paperRef = useRef<HTMLDivElement | null>(null);
 
-  function pxToMm(px: number) {
-    const paper = paperRef.current;
-    if (!paper) return px;
-    const rect = paper.getBoundingClientRect();
-    if (rect.width === 0) return px;
-    return (px / rect.width) * doc.width;
+  /** Millimetres per CSS pixel at the paper's rendered size. */
+  function mmPerPx() {
+    const width = paperRef.current?.getBoundingClientRect().width;
+    return width ? doc.width / width : 1;
   }
 
   function clientToMm(clientX: number, clientY: number) {
-    const paper = paperRef.current;
-    if (!paper) return { x: 0, y: 0 };
-    const rect = paper.getBoundingClientRect();
-    const scaleX = rect.width === 0 ? 1 : doc.width / rect.width;
-    const scaleY = rect.height === 0 ? 1 : doc.height / rect.height;
+    const rect = paperRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    const scale = mmPerPx();
     return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY,
+      x: (clientX - rect.left) * scale,
+      y: (clientY - rect.top) * scale,
     };
   }
 
   /** Clamp an element's top-left so the element stays inside the paper. */
   function clampPosition(x: number, y: number, node: HTMLElement) {
     const rect = node.getBoundingClientRect();
-    const maxX = Math.max(0, doc.width - pxToMm(rect.width));
-    const maxY = Math.max(0, doc.height - pxToMm(rect.height));
+    const scale = mmPerPx();
     return {
-      x: Math.max(0, Math.min(maxX, x)),
-      y: Math.max(0, Math.min(maxY, y)),
+      x: Math.max(0, Math.min(doc.width - rect.width * scale, x)),
+      y: Math.max(0, Math.min(doc.height - rect.height * scale, y)),
     };
   }
 
@@ -75,11 +80,10 @@ export default function ArtboardRenderer({
 
     const startClientX = e.clientX;
     const startClientY = e.clientY;
-    const startX = el.x;
-    const startY = el.y;
+    const scale = mmPerPx();
     let dragging = false;
-    let lastX = startX;
-    let lastY = startY;
+    let lastX = el.x;
+    let lastY = el.y;
 
     const handleMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startClientX;
@@ -88,11 +92,7 @@ export default function ArtboardRenderer({
         return;
       }
       dragging = true;
-      const next = clampPosition(
-        startX + pxToMm(dx),
-        startY + pxToMm(dy),
-        target,
-      );
+      const next = clampPosition(el.x + dx * scale, el.y + dy * scale, target);
       lastX = next.x;
       lastY = next.y;
       // Write straight to the node during the drag; the document state is
@@ -128,36 +128,31 @@ export default function ArtboardRenderer({
       onSelect(el.id);
       return;
     }
-    const step = e.shiftKey ? NUDGE_LARGE_MM : NUDGE_MM;
-    const nudges: Record<string, [number, number]> = {
-      ArrowLeft: [-step, 0],
-      ArrowRight: [step, 0],
-      ArrowUp: [0, -step],
-      ArrowDown: [0, step],
-    };
-    const nudge = nudges[e.key];
-    if (!nudge) return;
+    const direction = NUDGE_DIRECTIONS[e.key];
+    if (!direction) return;
     e.preventDefault();
     onSelect(el.id);
+    const step = e.shiftKey ? NUDGE_LARGE_MM : NUDGE_MM;
     const next = clampPosition(
-      el.x + nudge[0],
-      el.y + nudge[1],
+      el.x + direction[0] * step,
+      el.y + direction[1] * step,
       e.currentTarget,
     );
     onMoveElement(el.id, next.x, next.y);
   }
 
   function handlePaperClick(e: TargetedMouseEvent<HTMLDivElement>) {
-    // The paper owns every click that lands on it (or bubbles up from an
-    // element); without this, the click would reach the canvas handler and
-    // immediately deselect what was just selected or created.
+    // The paper owns every click that lands on it; without this, the click
+    // would reach the canvas handler and immediately deselect what was just
+    // selected or created.
     e.stopPropagation();
     if (activeTool === "text") {
+      // Clicks on elements fall through to here in text mode, so text can
+      // be placed on top of existing elements.
       const { x, y } = clientToMm(e.clientX, e.clientY);
       onAddTextElement(x, y);
-      return;
-    }
-    if (e.target === e.currentTarget) {
+    } else {
+      // In select mode elements keep their own clicks: this hit bare paper.
       onSelect(null);
     }
   }
@@ -165,74 +160,46 @@ export default function ArtboardRenderer({
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: Deselect-on-background-click is a pointer affordance; Escape provides the keyboard route (DocumentEditor).
     // biome-ignore lint/a11y/noStaticElementInteractions: Deselect-on-background-click is a pointer affordance; Escape provides the keyboard route (DocumentEditor).
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        overflow: "auto",
-        position: "relative",
-        background: "var(--bg)",
-      }}
-      onClick={(e) => {
-        // deselect background
-        if (e.target === e.currentTarget) onSelect(null);
-      }}
-    >
-      <div
-        style={{
-          margin: "auto",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: "8px",
-        }}
-      >
-        {onResize && (
-          // biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation prevents canvas deselect when interacting with size inputs.
-          // biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation prevents canvas deselect when interacting with size inputs.
-          <div class="df-page-size" onClick={(e) => e.stopPropagation()}>
-            <label htmlFor="df-artboard-width">
-              W
-              <NumberField
-                id="df-artboard-width"
-                class="df-page-input df-number"
-                value={doc.width}
-                min={1}
-                onCommit={(v) => onResize(v, doc.height)}
-              />
-              <span class="df-sr-only">mm</span>
-            </label>
-            <label htmlFor="df-artboard-height">
-              H
-              <NumberField
-                id="df-artboard-height"
-                class="df-page-input df-number"
-                value={doc.height}
-                min={1}
-                onCommit={(v) => onResize(doc.width, v)}
-              />
-              mm
-            </label>
-          </div>
-        )}
+    <div class="df-canvas" onClick={() => onSelect(null)}>
+      <div class="df-stage">
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation prevents canvas deselect when interacting with size inputs. */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation prevents canvas deselect when interacting with size inputs. */}
+        <div class="df-page-size" onClick={(e) => e.stopPropagation()}>
+          <label htmlFor="df-artboard-width">
+            W
+            <NumberField
+              id="df-artboard-width"
+              class="df-input"
+              value={doc.width}
+              min={1}
+              max={MAX_DIMENSION_MM}
+              onCommit={(v) => onResize(v, doc.height)}
+            />
+            <span class="df-sr-only">mm</span>
+          </label>
+          <label htmlFor="df-artboard-height">
+            H
+            <NumberField
+              id="df-artboard-height"
+              class="df-input"
+              value={doc.height}
+              min={1}
+              max={MAX_DIMENSION_MM}
+              onCommit={(v) => onResize(doc.width, v)}
+            />
+            mm
+          </label>
+        </div>
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: Text placement by click has a keyboard route (Enter places at paper center, handled in DocumentEditor). */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: Text placement by click has a keyboard route (Enter places at paper center, handled in DocumentEditor). */}
         <div
           ref={paperRef}
           data-testid="artboard-paper"
+          class="df-paper"
           style={{
-            position: "relative",
-            background: "white",
-            border: "1px solid var(--panel-border)",
             width: `${doc.width}mm`,
             height: `${doc.height}mm`,
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "flex-start",
-            boxSizing: "border-box",
-            cursor: activeTool === "text" ? "crosshair" : "default",
+            cursor: activeTool === "text" ? "crosshair" : undefined,
           }}
           onClick={handlePaperClick}
         >
@@ -248,21 +215,14 @@ export default function ArtboardRenderer({
               onKeyDown={(e) => handleElementKeyDown(e, el)}
               onClick={(e) => {
                 // In select mode the element owns the click; in text mode it
-                // falls through to the paper so text can be placed on top of
-                // existing elements.
+                // falls through to the paper.
                 if (activeTool === "select") e.stopPropagation();
               }}
               style={{
-                position: "absolute",
                 left: `${el.x}mm`,
                 top: `${el.y}mm`,
-                padding: "1px 2px",
-                color: "black",
-                cursor: activeTool === "select" ? "move" : "default",
                 fontSize: `${el.fontSize}mm`,
-                fontFamily: "sans-serif",
-                userSelect: "none",
-                touchAction: "none",
+                cursor: activeTool === "select" ? "move" : undefined,
               }}
             >
               {el.text}

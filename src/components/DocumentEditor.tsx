@@ -1,8 +1,5 @@
 import type { TextElement } from "@dotforge/core";
-import { useEffect, useState } from "preact/hooks";
-import MainMenu from "../components/layout/MainMenu";
-import PropertiesPanel from "../components/layout/PropertiesPanel";
-import ShapesToolbar, { type Tool } from "../components/layout/ShapesToolbar";
+import { useEffect, useRef, useState } from "preact/hooks";
 import {
   createTextElement,
   downloadDocument,
@@ -10,6 +7,9 @@ import {
   parseDocument,
 } from "../lib/dotforge";
 import ArtboardRenderer from "./ArtboardRenderer";
+import MainMenu from "./layout/MainMenu";
+import PropertiesPanel from "./layout/PropertiesPanel";
+import ShapesToolbar, { type Tool } from "./layout/ShapesToolbar";
 
 /** How much of an element must stay reachable inside the paper (mm). */
 const EDGE_MARGIN_MM = 5;
@@ -29,15 +29,6 @@ export default function DocumentEditor({
   function updateDoc(updater: (prev: EditorDocument) => EditorDocument) {
     setDoc(updater);
     setDirty(true);
-  }
-
-  function handleMoveElement(id: string, x: number, y: number) {
-    updateDoc((prev) => ({
-      ...prev,
-      elements: prev.elements.map((el) =>
-        el.id === id ? { ...el, x, y } : el,
-      ),
-    }));
   }
 
   function handleChangeElement(id: string, patch: Partial<TextElement>) {
@@ -97,35 +88,43 @@ export default function DocumentEditor({
     }
   }
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable)
-      ) {
-        return;
-      }
-      if (e.key === "Escape") {
-        setSelectedId(null);
-        return;
-      }
-      if (e.key === "Enter" && activeTool === "text") {
-        // Keyboard route for placing text: drop it at the paper center.
-        e.preventDefault();
-        handleAddTextElement(doc.width / 2, doc.height / 2);
-        return;
-      }
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
-        e.preventDefault();
-        handleDeleteElement(selectedId);
-      }
+  function handleKeyDown(e: KeyboardEvent) {
+    const target = e.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable)
+    ) {
+      return;
     }
+    if (e.key === "Escape") {
+      setSelectedId(null);
+      return;
+    }
+    if (e.key === "Enter" && activeTool === "text") {
+      // Keyboard route for placing text: drop it at the paper center.
+      e.preventDefault();
+      handleAddTextElement(doc.width / 2, doc.height / 2);
+      return;
+    }
+    if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+      e.preventDefault();
+      handleDeleteElement(selectedId);
+    }
+  }
+
+  // Subscribe once and dispatch through a ref that each render repoints at
+  // its own handler. Re-subscribing in an effect instead would leave a
+  // window after every selection change where a key press hits the
+  // previous render's handler and its stale selection.
+  const keyDownRef = useRef(handleKeyDown);
+  keyDownRef.current = handleKeyDown;
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => keyDownRef.current(e);
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedId, activeTool, doc.width, doc.height]);
+  }, []);
 
   useEffect(() => {
     if (!dirty) return;
@@ -140,20 +139,13 @@ export default function DocumentEditor({
   }, [dirty]);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        flex: 1,
-        minHeight: 0,
-        width: "100%",
-      }}
-    >
+    <div class="df-editor">
       <ArtboardRenderer
         doc={doc}
         selectedId={selectedId}
         onSelect={setSelectedId}
         onResize={handleResize}
-        onMoveElement={handleMoveElement}
+        onMoveElement={(id, x, y) => handleChangeElement(id, { x, y })}
         onAddTextElement={handleAddTextElement}
         activeTool={activeTool}
       />
@@ -167,10 +159,10 @@ export default function DocumentEditor({
       <div class="df-float-top-center">
         <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />
         {/* Always rendered so screen readers announce the hint as it changes. */}
-        <p class="df-hint" aria-live="polite">
+        <div class="df-hint" aria-live="polite">
           {activeTool === "text" &&
             "Click the page to place text, or press Enter to drop it in the center"}
-        </p>
+        </div>
       </div>
 
       {selected && (

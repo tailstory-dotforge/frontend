@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import "../styles/themes.css";
 import DebugBanner from "../components/debug/DebugBanner.astro";
-import { themeColors } from "../lib/theme";
+import { THEME_STORAGE_KEY, themeColors } from "../lib/theme";
 
 interface Props {
   pageTitle?: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const {
-  pageTitle,
+  pageTitle = "Dotforge",
   description = "Dotforge — a label and artboard document editor",
 } = Astro.props;
 ---
@@ -21,16 +21,16 @@ const {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content={themeColors.light} />
         <meta name="description" content={description} />
-        <meta property="og:title" content={pageTitle || "Dotforge"} />
+        <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={description} />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <title>{pageTitle || "Dotforge"}</title>
-        <script is:inline define:vars={{ themeColors }}>
+        <title>{pageTitle}</title>
+        <script is:inline define:vars={{ themeColors, storageKey: THEME_STORAGE_KEY }}>
             // Pre-paint theme bootstrap. Mirrors applyResolvedTheme in
             // src/lib/theme.ts (which cannot be imported from an inline
             // script) — keep the two in sync.
             (function() {
-                var saved = localStorage.getItem("dotforge-theme");
+                var saved = localStorage.getItem(storageKey);
                 var resolved;
                 // Own-property check: a truthy lookup would accept inherited
                 // keys like "toString" from a crafted localStorage value.

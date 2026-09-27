@@ -1,6 +1,5 @@
 import type { TextElement } from "@dotforge/core";
 import { Trash2 } from "lucide-preact";
-import type { TargetedInputEvent } from "preact";
 import type { EditorElement } from "../../lib/dotforge";
 import NumberField from "../NumberField";
 
@@ -14,18 +13,14 @@ export default function PropertiesPanel({
   onDelete: () => void;
 }) {
   return (
-    <fieldset class="df-panel df-props-panel">
-      <legend class="df-sr-only">Text properties</legend>
-
+    <fieldset aria-label="Text properties" class="df-panel df-props-panel">
       <label class="df-field df-field-text">
         Text
         <input
           type="text"
           class="df-input"
           value={element.text}
-          onInput={(e: TargetedInputEvent<HTMLInputElement>) => {
-            onChange({ text: e.currentTarget.value });
-          }}
+          onInput={(e) => onChange({ text: e.currentTarget.value })}
         />
       </label>
 
@@ -34,17 +29,17 @@ export default function PropertiesPanel({
         <span class="df-input df-input-affix">
           <NumberField
             id="df-font-size"
-            class="df-number"
             value={element.fontSize}
             min={0.1}
             step={0.1}
+            live
             onCommit={(next) => onChange({ fontSize: next })}
           />
           mm
         </span>
       </label>
 
-      <hr class="df-divider" />
+      <hr />
 
       <button
         type="button"

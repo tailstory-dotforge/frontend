@@ -17,14 +17,20 @@ export interface EditorDocument extends DotforgeDocument {
   elements: EditorElement[];
 }
 
-export function createTextElement(x: number, y: number): EditorElement {
+export function createTextElement(
+  x: number,
+  y: number,
+  text = "Text",
+): EditorElement {
+  return { id: crypto.randomUUID(), type: "text", x, y, text, fontSize: 3 };
+}
+
+/** The document a fresh editor opens with. */
+export function sampleDocument(): EditorDocument {
   return {
-    id: crypto.randomUUID(),
-    type: "text",
-    x,
-    y,
-    text: "Text",
-    fontSize: 3,
+    width: 100,
+    height: 150,
+    elements: [createTextElement(5, 10, "Hello Dotforge")],
   };
 }
 
@@ -65,19 +71,23 @@ export function serializeDocument(doc: DotforgeDocument): string {
 }
 
 export function parseDocument(text: string): EditorDocument {
-  const parsed: unknown = JSON.parse(text);
+  const doc = JSON.parse(text) as Partial<Record<string, unknown>> | null;
   if (
-    !parsed ||
-    typeof parsed !== "object" ||
-    !isValidDimension((parsed as Record<string, unknown>).width) ||
-    !isValidDimension((parsed as Record<string, unknown>).height) ||
-    !Array.isArray((parsed as Record<string, unknown>).elements) ||
-    !(parsed as { elements: unknown[] }).elements.every(isValidElement)
+    typeof doc !== "object" ||
+    doc === null ||
+    !isValidDimension(doc.width) ||
+    !isValidDimension(doc.height) ||
+    !Array.isArray(doc.elements) ||
+    !doc.elements.every(isValidElement)
   ) {
     throw new Error("Not a valid .dotforge file");
   }
-  const doc = parsed as DotforgeDocument;
-  return { ...doc, elements: doc.elements.map(withId) };
+  return {
+    ...doc,
+    width: doc.width,
+    height: doc.height,
+    elements: doc.elements.map(withId),
+  };
 }
 
 export function downloadDocument(

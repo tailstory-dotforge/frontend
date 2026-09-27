@@ -1,38 +1,27 @@
-import { cloneElement, type VNode } from "preact";
+import type { LucideIcon } from "lucide-preact";
+import type { ButtonHTMLAttributes } from "preact";
 
 export default function ToolbarIcon({
   label,
-  children,
-  onClick,
+  icon: Icon,
   active,
-  ariaHasPopup,
-  ariaExpanded,
+  ...props
 }: {
   label: string;
-  children: VNode;
-  onClick?: () => void;
-  /** For toggle buttons; exposed to assistive tech as aria-pressed. */
+  icon: LucideIcon;
+  /** For toggle buttons; exposed as aria-pressed, which also styles it. */
   active?: boolean;
-  /** For buttons that open a popup (e.g. the theme menu). */
-  ariaHasPopup?: "menu";
-  ariaExpanded?: boolean;
-}) {
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       type="button"
       title={label}
       aria-label={label}
       aria-pressed={active}
-      aria-haspopup={ariaHasPopup}
-      aria-expanded={ariaExpanded}
-      onClick={onClick}
-      class={`df-toolbar-btn${active ? " is-active" : ""}`}
+      class="df-toolbar-btn"
+      {...props}
     >
-      {cloneElement(children, {
-        size: 18,
-        strokeWidth: 1.5,
-        color: "currentColor",
-      })}
+      <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
     </button>
   );
 }

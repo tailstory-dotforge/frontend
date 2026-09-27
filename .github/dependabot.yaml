@@ -19,5 +19,11 @@ updates:
       javascript-dependencies:
         patterns:
           - "*"
+      # Security fixes for transitive packages otherwise arrive one PR per
+      # package; batch them like the monthly version updates.
+      javascript-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
     cooldown:
       default-days: 7
