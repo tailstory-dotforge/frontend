@@ -1,6 +1,6 @@
 import type { TextElement } from "@dotforge/core";
 import { useEffect, useState } from "preact/hooks";
-import FileToolbar from "../components/layout/FileToolbar";
+import MainMenu from "../components/layout/MainMenu";
 import PropertiesPanel from "../components/layout/PropertiesPanel";
 import ShapesToolbar, { type Tool } from "../components/layout/ShapesToolbar";
 import {
@@ -158,18 +158,19 @@ export default function DocumentEditor({
         activeTool={activeTool}
       />
 
-      <div
-        class="df-float-top-center"
-        style={{
-          display: "flex",
-          gap: "12px",
-        }}
-      >
+      <MainMenu
+        activeModule="artboard"
+        onDownload={handleDownload}
+        onUploadFile={handleUploadFile}
+      />
+
+      <div class="df-float-top-center">
         <ShapesToolbar activeTool={activeTool} onSelectTool={setActiveTool} />
-        <FileToolbar
-          onDownload={handleDownload}
-          onUploadFile={handleUploadFile}
-        />
+        {/* Always rendered so screen readers announce the hint as it changes. */}
+        <p class="df-hint" aria-live="polite">
+          {activeTool === "text" &&
+            "Click the page to place text, or press Enter to drop it in the center"}
+        </p>
       </div>
 
       {selected && (

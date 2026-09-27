@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
  */
 export default function NumberField({
   id,
+  class: className,
   value,
   min,
   step,
@@ -16,6 +17,7 @@ export default function NumberField({
   style,
 }: {
   id?: string;
+  class?: string;
   value: number;
   min?: number;
   step?: number;
@@ -35,6 +37,7 @@ export default function NumberField({
     <input
       ref={inputRef}
       id={id}
+      class={className}
       type="number"
       min={min}
       step={step}

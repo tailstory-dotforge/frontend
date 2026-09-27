@@ -1,14 +1,22 @@
+/* Flat chrome: islands are a shade lighter (or darker) than the canvas and
+   edged with a hairline; buttons have no fill or edge until hovered or
+   active. The paper stays white in every theme — it is the print output. */
 :root {
   color-scheme: light dark;
-  --bg: #ffffff;
-  --panel: #f6f8fa;
-  --panel-border: #d0d7de;
-  --button-bg: #f6f8fa;
-  --button-border: #d0d7de;
-  --button-hover: #eaeef2;
-  --icon: #57606a;
-  --icon-hover: #111827;
-  --text: #111827;
+  --bg: #f4f4f2;
+  --panel: #ffffff;
+  --panel-border: #e3e3df;
+  --button-hover: #f0f0ed;
+  --icon: #4a4a46;
+  --icon-hover: #1b1b18;
+  --text: #1b1b18;
+  --muted: #6b6b65;
+  --field: rgb(0 0 0 / 5%);
+  --accent: #3a5bd9;
+  --accent-soft: #e7ebfa;
+  --danger: #b93a2e;
+  /* Drawn on the always-white paper, so it must read on white. */
+  --selection: #3a5bd9;
 }
 
 html.theme-light {
@@ -17,39 +25,51 @@ html.theme-light {
 
 html.theme-dark {
   color-scheme: dark;
-  --bg: #0d1117;
-  --panel: #161b22;
-  --panel-border: #30363d;
-  --button-bg: #21262d;
-  --button-border: #30363d;
-  --button-hover: #30363d;
-  --icon: #c9d1d9;
+  --bg: #141414;
+  --panel: #1e1e1f;
+  --panel-border: #2e2e30;
+  --button-hover: #2a2a2c;
+  --icon: #c8c8c4;
   --icon-hover: #ffffff;
-  --text: #f0f6fc;
+  --text: #ececea;
+  --muted: #9a9a95;
+  --field: rgb(255 255 255 / 6%);
+  --accent: #9cb0ff;
+  --accent-soft: #28304f;
+  --danger: #ff8a80;
+  --selection: #3a5bd9;
 }
 
 html.theme-solarized {
   color-scheme: light;
-  --bg: #fdf6e3;
-  --panel: #eee8d5;
-  --panel-border: #93a1a1;
-  --button-bg: #eee8d5;
-  --button-border: #93a1a1;
-  --button-hover: #e4dcc6;
-  --icon: #586e75;
+  --bg: #eee8d5;
+  --panel: #fdf6e3;
+  --panel-border: #d9d2bd;
+  --button-hover: #f3ecd8;
+  --icon: #4a5f66;
   --icon-hover: #073642;
   --text: #073642;
+  --muted: #52676e;
+  --field: rgb(7 54 66 / 7%);
+  --accent: #1f73b0;
+  --accent-soft: #e0e8e6;
+  --danger: #b52a27;
+  --selection: #1f73b0;
 }
 
 html.theme-neon {
   color-scheme: dark;
   --bg: #0a0e27;
-  --panel: #1a1f3a;
-  --panel-border: #7b82d1;
-  --button-bg: #1a1f3a;
-  --button-border: #7b82d1;
-  --button-hover: #2d334d;
-  --icon: #f0f0f0;
-  --icon-hover: #ff00ff;
+  --panel: #131836;
+  --panel-border: #2e3570;
+  --button-hover: #1f2548;
+  --icon: #d6d8f0;
+  --icon-hover: #ffffff;
   --text: #ffffff;
+  --muted: #9ea3d4;
+  --field: rgb(255 255 255 / 7%);
+  --accent: #ff4dff;
+  --accent-soft: #3a1848;
+  --danger: #ff6b8b;
+  --selection: #c800c8;
 }

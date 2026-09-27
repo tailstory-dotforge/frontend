@@ -1,4 +1,5 @@
 import type { TextElement } from "@dotforge/core";
+import { Trash2 } from "lucide-preact";
 import type { TargetedInputEvent } from "preact";
 import type { EditorElement } from "../../lib/dotforge";
 import NumberField from "../NumberField";
@@ -13,74 +14,49 @@ export default function PropertiesPanel({
   onDelete: () => void;
 }) {
   return (
-    <div
-      class="df-props-panel"
-      style={{
-        background: "var(--panel)",
-        color: "var(--text)",
-        border: "1px solid var(--panel-border)",
-        padding: "12px 14px",
-        fontFamily: "sans-serif",
-        fontSize: "13px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
-      }}
-    >
-      <div style={{ marginBottom: "10px", fontWeight: 600 }}>
-        Text Properties
-      </div>
+    <fieldset class="df-panel df-props-panel">
+      <legend class="df-sr-only">Text properties</legend>
 
-      <label style={{ display: "block", marginBottom: "10px" }}>
+      <label class="df-field df-field-text">
         Text
-        <br />
         <input
           type="text"
+          class="df-input"
           value={element.text}
           onInput={(e: TargetedInputEvent<HTMLInputElement>) => {
             onChange({ text: e.currentTarget.value });
           }}
-          style={{
-            width: "100%",
-            marginTop: "4px",
-          }}
         />
       </label>
 
-      <label
-        htmlFor="df-font-size"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        Font Size (mm)
-        <br />
-        <NumberField
-          id="df-font-size"
-          value={element.fontSize}
-          min={0.1}
-          step={0.1}
-          onCommit={(next) => onChange({ fontSize: next })}
-          style={{
-            width: "100%",
-            marginTop: "4px",
-          }}
-        />
+      <label class="df-field df-field-size" htmlFor="df-font-size">
+        Font size
+        <span class="df-input df-input-affix">
+          <NumberField
+            id="df-font-size"
+            class="df-number"
+            value={element.fontSize}
+            min={0.1}
+            step={0.1}
+            onCommit={(next) => onChange({ fontSize: next })}
+          />
+          mm
+        </span>
       </label>
+
+      <hr class="df-divider" />
 
       <button
         type="button"
+        class="df-danger-btn"
+        aria-label="Delete"
+        aria-keyshortcuts="Delete Backspace"
         onClick={onDelete}
-        style={{
-          marginTop: "6px",
-          width: "100%",
-          padding: "6px 10px",
-          background: "var(--danger, #c0392b)",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "13px",
-        }}
       >
-        Delete
+        <Trash2 size={16} strokeWidth={1.5} aria-hidden="true" />
+        <span class="df-danger-label">Delete</span>
+        <kbd class="df-kbd">Del</kbd>
       </button>
-    </div>
+    </fieldset>
   );
 }

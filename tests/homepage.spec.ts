@@ -10,10 +10,11 @@ test("homepage loads successfully", async ({ page }) => {
 test("document editor is present", async ({ page }) => {
   await page.goto("/");
 
-  // The file toolbar and the rendered sample document prove the
-  // DocumentEditor component actually mounted
+  // The main menu, the select tool and the rendered sample document prove
+  // the DocumentEditor component actually mounted
+  await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Download .dotforge" }),
+    page.getByRole("button", { name: "Select", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Hello Dotforge", { exact: true })).toBeVisible();
 });

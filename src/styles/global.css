@@ -23,31 +23,44 @@ body {
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 13px;
   background: var(--bg);
   color: var(--text);
   display: flex;
   flex-direction: column;
 }
 
-/* Shared visual style for the floating toolbar panels. */
+.df-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Islands: the flat surfaces all floating chrome sits on. A hairline edge
+   and no shadow. */
 .df-panel {
   background: var(--panel);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 4px;
   display: flex;
-  gap: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  gap: 2px;
 }
 
-/* Icon buttons (and icon links) inside toolbar panels. */
+/* Icon buttons (and icon links) inside islands: no fill or edge at rest. */
 .df-toolbar-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  background: transparent;
+  border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -58,71 +71,362 @@ body {
     background 0.15s,
     color 0.15s;
 }
-.df-toolbar-btn.is-active {
+.df-toolbar-btn[aria-expanded="true"] {
   background: var(--button-hover);
   color: var(--icon-hover);
-  /* Non-color cue so the active tool reads without color vision. */
-  box-shadow: inset 0 -2px 0 var(--icon-hover);
+}
+.df-toolbar-btn.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+/* Non-color cue so the active tool reads without color vision. :where()
+   keeps the specificity low so later icon-size rules stay simple. */
+:where(.df-toolbar-btn.is-active) svg {
+  stroke-width: 2;
 }
 @media (hover: hover) {
-  .df-toolbar-btn:hover {
+  .df-toolbar-btn:not(.is-active):hover {
     background: var(--button-hover);
     color: var(--icon-hover);
   }
 }
-
-/* Items in dropdown menus (theme picker). */
-.df-menu-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: var(--text);
-  background: transparent;
-  transition: background 0.15s;
-  font: inherit;
+.df-toolbar-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
-.df-menu-item.is-active {
-  background: var(--button-hover);
-  font-weight: 600;
+
+/* Main menu dropdown. */
+.df-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 248px;
+  box-sizing: border-box;
+  padding: 6px;
+  flex-direction: column;
+}
+.df-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.df-menu-item > svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.df-menu-item > .df-menu-check {
+  margin-left: auto;
+  color: var(--accent);
 }
 @media (hover: hover) {
   .df-menu-item:hover {
     background: var(--button-hover);
   }
 }
+.df-menu-item:focus-visible {
+  background: var(--button-hover);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.df-menu-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.df-menu-label-value {
+  color: var(--text);
+}
+.df-menu-separator {
+  height: 1px;
+  margin: 4px;
+  border: none;
+  background: var(--panel-border);
+}
+
+/* Theme swatches: each theme's canvas with its accent as a dot. */
+.df-swatches {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 6px 4px;
+  border: none;
+}
+.df-swatch-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .df-swatch-btn:hover {
+    background: var(--button-hover);
+  }
+}
+.df-swatch-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.df-swatch {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 14%);
+}
+.df-swatch-btn[aria-checked="true"] .df-swatch {
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 14%),
+    0 0 0 3px var(--panel),
+    0 0 0 4.5px var(--accent);
+}
+.df-swatch-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* One-line hint under the toolbar while a tool needs explaining. */
+.df-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Page size, labelled above the paper's top-left corner. */
+.df-page-size {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.df-page-size label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.df-page-input {
+  width: 48px;
+  height: 22px;
+  box-sizing: border-box;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: var(--field);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.df-page-input:focus {
+  border-color: var(--accent);
+  background: var(--panel);
+  outline: none;
+}
+
+/* Number inputs read as plain fields; arrow keys still step them. */
+.df-number {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.df-number::-webkit-inner-spin-button,
+.df-number::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Artboard elements. Kept out of the theme transitions above. */
+.df-element.is-selected {
+  outline: 1px solid var(--selection);
+  outline-offset: 2px;
+}
+.df-element:focus-visible {
+  outline: 2px solid var(--selection);
+  outline-offset: 2px;
+}
+
+/* Properties island fields. */
+.df-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.df-input {
+  width: 100%;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: var(--field);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+.df-input:focus,
+.df-input:focus-within {
+  border-color: var(--accent);
+  background: var(--panel);
+  outline: none;
+}
+.df-input-affix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.df-input-affix input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+.df-divider {
+  height: 1px;
+  margin: 0;
+  border: none;
+  background: var(--panel-border);
+}
+.df-danger-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin: -4px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+@media (hover: hover) {
+  .df-danger-btn:hover {
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+  }
+}
+.df-danger-btn:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: -2px;
+}
+.df-danger-label {
+  flex: 1;
+}
+.df-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
 
 /* Floating UI groups — positioning lives here so media queries can override
    the components' inline visual styles. */
 .df-float-left {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-}
-.df-float-right {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  left: 16px;
   z-index: 1000;
 }
 .df-float-top-center {
   position: absolute;
-  top: 20px;
+  top: 16px;
   left: 50%;
   transform: translateX(-50%);
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   z-index: 1000;
+  /* Only the toolbar itself takes clicks; the rest falls through to the
+     canvas. */
+  pointer-events: none;
+}
+.df-float-top-center > .df-panel {
+  pointer-events: auto;
 }
 .df-props-panel {
+  /* A <fieldset>: reset its default chrome. */
+  min-width: 0;
+  margin: 0;
   position: fixed;
-  top: 50%;
+  /* Directly under the menu island: 16px inset + 46px island + 12px. */
+  top: 74px;
   left: 16px;
-  transform: translateY(-50%);
-  width: 204px;
-  border-radius: 8px;
-  z-index: 9999;
+  width: 224px;
+  box-sizing: border-box;
+  padding: 12px;
+  flex-direction: column;
+  gap: 12px;
+  /* Below the floating groups so the open menu covers it. */
+  z-index: 999;
+}
+
+/* Touch: 44px targets and 16px input text (smaller makes iOS zoom). */
+@media (max-width: 640px), (pointer: coarse) {
+  .df-panel {
+    border-radius: 12px;
+  }
+  .df-toolbar-btn,
+  .df-swatch-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 9px;
+  }
+  .df-toolbar-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .df-menu-item {
+    height: 44px;
+    border-radius: 9px;
+  }
+  .df-page-input {
+    width: 60px;
+    height: 32px;
+    font-size: 16px;
+  }
+  .df-input {
+    height: 44px;
+    border-radius: 9px;
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -130,31 +434,61 @@ body {
     top: 8px;
     left: 8px;
   }
-  .df-float-right {
-    top: 8px;
-    right: 8px;
-  }
 
-  /* Center tool toolbar → full-width bottom bar, wraps if needed */
+  /* Tool toolbar → bottom-centered island. */
   .df-float-top-center {
     top: auto;
     bottom: 8px;
     left: 8px;
     right: 8px;
     transform: none;
-    justify-content: center;
-    flex-wrap: wrap;
+    width: auto;
+  }
+  /* Taps don't need the hint, and it would sit under the sheet. */
+  .df-hint {
+    display: none;
   }
 
-  /* Text Properties → bottom sheet, kept clear of the bottom-docked
-     toolbars so both stay usable at the same time. */
+  /* Text Properties → one-row bottom sheet, kept clear of the
+     bottom-docked toolbar so both stay usable at the same time. */
   .df-props-panel {
     top: auto;
-    bottom: 64px;
+    bottom: 70px;
     left: 8px;
     right: 8px;
-    transform: none;
     width: auto;
-    border-radius: 12px;
+    padding: 10px;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .df-field {
+    gap: 4px;
+  }
+  .df-field-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .df-field-size {
+    width: 84px;
+    flex-shrink: 0;
+  }
+  .df-divider,
+  .df-danger-label,
+  .df-kbd {
+    display: none;
+  }
+  .df-danger-btn {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    border-radius: 9px;
+  }
+  .df-danger-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }

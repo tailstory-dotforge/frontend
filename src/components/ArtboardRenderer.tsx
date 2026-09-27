@@ -184,10 +184,38 @@ export default function ArtboardRenderer({
           margin: "auto",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          alignItems: "flex-start",
           gap: "8px",
         }}
       >
+        {onResize && (
+          // biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation prevents canvas deselect when interacting with size inputs.
+          // biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation prevents canvas deselect when interacting with size inputs.
+          <div class="df-page-size" onClick={(e) => e.stopPropagation()}>
+            <label htmlFor="df-artboard-width">
+              W
+              <NumberField
+                id="df-artboard-width"
+                class="df-page-input df-number"
+                value={doc.width}
+                min={1}
+                onCommit={(v) => onResize(v, doc.height)}
+              />
+              <span class="df-sr-only">mm</span>
+            </label>
+            <label htmlFor="df-artboard-height">
+              H
+              <NumberField
+                id="df-artboard-height"
+                class="df-page-input df-number"
+                value={doc.height}
+                min={1}
+                onCommit={(v) => onResize(doc.width, v)}
+              />
+              mm
+            </label>
+          </div>
+        )}
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: Text placement by click has a keyboard route (Enter places at paper center, handled in DocumentEditor). */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: Text placement by click has a keyboard route (Enter places at paper center, handled in DocumentEditor). */}
         <div
@@ -196,8 +224,7 @@ export default function ArtboardRenderer({
           style={{
             position: "relative",
             background: "white",
-            border: "2px solid var(--panel-border)",
-            borderRadius: "6px",
+            border: "1px solid var(--panel-border)",
             width: `${doc.width}mm`,
             height: `${doc.height}mm`,
             overflow: "hidden",
@@ -216,6 +243,7 @@ export default function ArtboardRenderer({
               role="button"
               tabIndex={0}
               aria-label={`Text element: ${el.text}`}
+              class={`df-element${selectedId === el.id ? " is-selected" : ""}`}
               onPointerDown={(e) => handleElementPointerDown(e, el)}
               onKeyDown={(e) => handleElementKeyDown(e, el)}
               onClick={(e) => {
@@ -230,10 +258,6 @@ export default function ArtboardRenderer({
                 top: `${el.y}mm`,
                 padding: "1px 2px",
                 color: "black",
-                background:
-                  selectedId === el.id ? "rgba(0,0,255,0.1)" : "transparent",
-                border:
-                  selectedId === el.id ? "1px solid rgba(0,0,255,0.4)" : "none",
                 cursor: activeTool === "select" ? "move" : "default",
                 fontSize: `${el.fontSize}mm`,
                 fontFamily: "sans-serif",
@@ -245,49 +269,6 @@ export default function ArtboardRenderer({
             </div>
           ))}
         </div>
-        {onResize && (
-          // biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation prevents canvas deselect when interacting with size inputs.
-          // biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation prevents canvas deselect when interacting with size inputs.
-          <div
-            style={{
-              display: "flex",
-              gap: "8px",
-              alignItems: "center",
-              fontSize: "12px",
-              color: "var(--text)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <label
-              htmlFor="df-artboard-width"
-              style={{ display: "flex", alignItems: "center", gap: "4px" }}
-            >
-              W
-              <NumberField
-                id="df-artboard-width"
-                value={doc.width}
-                min={1}
-                onCommit={(v) => onResize(v, doc.height)}
-                style={{ width: "60px" }}
-              />
-              mm
-            </label>
-            <label
-              htmlFor="df-artboard-height"
-              style={{ display: "flex", alignItems: "center", gap: "4px" }}
-            >
-              H
-              <NumberField
-                id="df-artboard-height"
-                value={doc.height}
-                min={1}
-                onCommit={(v) => onResize(doc.width, v)}
-                style={{ width: "60px" }}
-              />
-              mm
-            </label>
-          </div>
-        )}
       </div>
     </div>
   );
