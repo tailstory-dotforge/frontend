@@ -1,7 +1,7 @@
 ---
 import DocumentEditor from "@/components/DocumentEditor.tsx";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import SampleDocument from "@/SampleDocument";
+import { sampleDocument } from "@/lib/dotforge";
 
 // No request-time logic: build this page once and serve it from the CDN
 // instead of invoking the Worker per request.
@@ -9,5 +9,5 @@ export const prerender = true;
 ---
 
 <BaseLayout pageTitle="Dotforge - Editor">
-  <DocumentEditor doc={SampleDocument()} client:load />
+  <DocumentEditor doc={sampleDocument()} client:load />
 </BaseLayout>

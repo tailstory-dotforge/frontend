@@ -3,6 +3,7 @@ import {
   Download,
   FolderOpen,
   LayoutDashboard,
+  type LucideIcon,
   Menu,
 } from "lucide-preact";
 import type { TargetedKeyboardEvent } from "preact";
@@ -10,8 +11,9 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import type { ModuleId } from "../../lib/modules";
 import {
   applyResolvedTheme,
+  isThemeId,
   resolveTheme,
-  themeAccents,
+  THEME_STORAGE_KEY,
   themeColors,
   themes,
 } from "../../lib/theme";
@@ -22,7 +24,7 @@ const modules: {
   id: ModuleId;
   label: string;
   href: string;
-  icon: typeof LayoutDashboard;
+  icon: LucideIcon;
 }[] = [{ id: "artboard", label: "Artboard", href: "/", icon: LayoutDashboard }];
 
 const ITEM_SELECTOR = '[role="menuitem"], [role="menuitemradio"]';
@@ -37,30 +39,25 @@ export default function MainMenu({
   onUploadFile: (file: File) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    // Read saved preference from localStorage (not resolved theme from DOM)
-    if (typeof localStorage !== "undefined") {
-      return localStorage.getItem("dotforge-theme") || "system";
-    }
-    return "system";
-  });
+  // The saved preference ("system" included), not the resolved theme.
+  const [theme, setTheme] = useState(() =>
+    typeof window === "undefined"
+      ? "system"
+      : (localStorage.getItem(THEME_STORAGE_KEY) ?? "system"),
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Listen for system preference changes when using "system" theme. Lives
-  // here rather than in the menu body so it runs while the menu is closed.
+  // Follow OS light/dark changes while the preference isn't a concrete
+  // theme ("system", or a stale stored value).
   useEffect(() => {
+    if (isThemeId(theme)) return;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    function handleChange() {
-      const saved = localStorage.getItem("dotforge-theme");
-      if (saved === "system" || !saved) {
-        applyResolvedTheme(resolveTheme("system"));
-      }
-    }
+    const handleChange = () => applyResolvedTheme(resolveTheme(theme));
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
     if (!open) return;
@@ -86,7 +83,7 @@ export default function MainMenu({
 
   function applyTheme(t: string) {
     setTheme(t);
-    localStorage.setItem("dotforge-theme", t);
+    localStorage.setItem(THEME_STORAGE_KEY, t);
     applyResolvedTheme(resolveTheme(t));
   }
 
@@ -136,12 +133,11 @@ export default function MainMenu({
       <div class="df-panel">
         <ToolbarIcon
           label="Menu"
+          icon={Menu}
+          aria-haspopup="menu"
+          aria-expanded={open}
           onClick={() => setOpen(!open)}
-          ariaHasPopup="menu"
-          ariaExpanded={open}
-        >
-          <Menu />
-        </ToolbarIcon>
+        />
       </div>
 
       {open && (
@@ -179,7 +175,7 @@ export default function MainMenu({
             Download .dotforge
           </button>
 
-          <hr class="df-menu-separator" />
+          <hr />
 
           <div class="df-menu-label" aria-hidden="true">
             <span>Theme</span>
@@ -198,6 +194,8 @@ export default function MainMenu({
                 class="df-swatch-btn"
                 onClick={() => applyTheme(t.id)}
               >
+                {/* Each swatch wears its theme's class, so it paints with
+                    that theme's own --bg and --accent. */}
                 {t.id === "system" ? (
                   <span
                     class="df-swatch"
@@ -206,21 +204,15 @@ export default function MainMenu({
                     }}
                   />
                 ) : (
-                  <span
-                    class="df-swatch"
-                    style={{ background: themeColors[t.id] }}
-                  >
-                    <span
-                      class="df-swatch-dot"
-                      style={{ background: themeAccents[t.id] }}
-                    />
+                  <span class={`df-swatch theme-${t.id}`}>
+                    <span class="df-swatch-dot" />
                   </span>
                 )}
               </button>
             ))}
           </fieldset>
 
-          <hr class="df-menu-separator" />
+          <hr />
 
           <div class="df-menu-label" aria-hidden="true">
             Editor

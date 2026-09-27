@@ -1,8 +1,13 @@
 /* Flat chrome: islands are a shade lighter (or darker) than the canvas and
    edged with a hairline; buttons have no fill or edge until hovered or
-   active. The paper stays white in every theme — it is the print output. */
-:root {
-  color-scheme: light dark;
+   active. The paper stays white in every theme — it is the print output.
+
+   Themes are plain classes rather than html-only selectors so any element
+   can wear one: the main menu's swatches do, to paint with their theme's
+   own --bg and --accent. */
+:root,
+.theme-light {
+  color-scheme: light;
   --bg: #f4f4f2;
   --panel: #ffffff;
   --panel-border: #e3e3df;
@@ -19,11 +24,7 @@
   --selection: #3a5bd9;
 }
 
-html.theme-light {
-  color-scheme: light;
-}
-
-html.theme-dark {
+.theme-dark {
   color-scheme: dark;
   --bg: #141414;
   --panel: #1e1e1f;
@@ -40,7 +41,7 @@ html.theme-dark {
   --selection: #3a5bd9;
 }
 
-html.theme-solarized {
+.theme-solarized {
   color-scheme: light;
   --bg: #eee8d5;
   --panel: #fdf6e3;
@@ -57,7 +58,7 @@ html.theme-solarized {
   --selection: #1f73b0;
 }
 
-html.theme-neon {
+.theme-neon {
   color-scheme: dark;
   --bg: #0a0e27;
   --panel: #131836;

@@ -1,19 +1,16 @@
 export type ThemeId = "light" | "dark" | "solarized" | "neon";
 
-/** Each theme's canvas color (--bg): the browser-chrome theme color. */
+export const THEME_STORAGE_KEY = "dotforge-theme";
+
+/**
+ * Each theme's canvas color (--bg in themes.css): the browser-chrome theme
+ * color, and the halves of the "System" swatch.
+ */
 export const themeColors: Record<ThemeId, string> = {
   light: "#f4f4f2",
   dark: "#141414",
   solarized: "#eee8d5",
   neon: "#0a0e27",
-};
-
-/** Each theme's --accent, the dot on its swatch in the main menu. */
-export const themeAccents: Record<ThemeId, string> = {
-  light: "#3a5bd9",
-  dark: "#9cb0ff",
-  solarized: "#1f73b0",
-  neon: "#ff4dff",
 };
 
 export const themes = [
