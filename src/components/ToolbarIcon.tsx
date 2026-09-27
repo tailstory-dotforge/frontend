@@ -29,8 +29,8 @@ export default function ToolbarIcon({
       class={`df-toolbar-btn${active ? " is-active" : ""}`}
     >
       {cloneElement(children, {
-        size: 20,
-        strokeWidth: 2,
+        size: 18,
+        strokeWidth: 1.5,
         color: "currentColor",
       })}
     </button>

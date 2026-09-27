@@ -2,20 +2,15 @@
 import "../styles/global.css";
 import "../styles/themes.css";
 import DebugBanner from "../components/debug/DebugBanner.astro";
-import MainMenu from "../components/layout/MainMenu";
-import ModuleSwitcher from "../components/layout/ModuleSwitcher.astro";
-import type { ModuleId } from "../lib/modules";
 import { themeColors } from "../lib/theme";
 
 interface Props {
   pageTitle?: string;
-  activeModule?: ModuleId;
   description?: string;
 }
 
 const {
   pageTitle,
-  activeModule = "artboard",
   description = "Dotforge — a label and artboard document editor",
 } = Astro.props;
 ---
@@ -60,8 +55,6 @@ const {
 
     <body>
         <DebugBanner />
-        <ModuleSwitcher activeModule={activeModule} />
-        <MainMenu client:idle />
         <slot />
     </body>
 </html>
