@@ -109,6 +109,11 @@ input {
   border-radius: calc(var(--radius) + 3px);
   background: var(--panel);
 }
+/* The menu trigger is a plain tile. Transparent rather than no border so it
+   keeps the islands' size and lines up with the tool toolbar. */
+.df-menu-trigger {
+  border-color: transparent;
+}
 
 /* Icon buttons inside islands. */
 .df-toolbar-btn,

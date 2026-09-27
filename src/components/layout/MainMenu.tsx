@@ -130,7 +130,7 @@ export default function MainMenu({
 
   return (
     <div class="df-float-left" ref={rootRef}>
-      <div class="df-panel">
+      <div class="df-panel df-menu-trigger">
         <ToolbarIcon
           label="Menu"
           icon={Menu}
