@@ -7,7 +7,7 @@ import {
   Menu,
 } from "lucide-preact";
 import type { TargetedKeyboardEvent } from "preact";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import type { ModuleId } from "../../lib/modules";
 import {
   applyResolvedTheme,
@@ -70,7 +70,10 @@ export default function MainMenu({
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [open]);
 
-  useEffect(() => {
+  // A layout effect, so focus is inside the menu before any later key
+  // event: a plain effect waits for paint, and a Delete pressed in between
+  // would still reach the editor's shortcuts from the trigger button.
+  useLayoutEffect(() => {
     if (open) {
       menuRef.current?.querySelector<HTMLElement>(ITEM_SELECTOR)?.focus();
     }
